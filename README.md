@@ -25,109 +25,104 @@ Participants will get hands-on experience designing workflows and activities, ha
 3. Docker and Docker Compose
 4. Homebrew
 
-## Sessions
-
 > **Note**: Find a good and simplistic use case for local temporal run
 
-### Session 1
-
-### Local Running Temporal
+## Local Running Temporal
 
 During this session participants will start by starting their own local Temporal setup.
+> **Read**: Technical materials [here](MATERIALS.md)
 
-Setup:
-* Setting up Local environment
-  * Run our [docker-compose.yaml](./docker-compose.yaml)
-    ```shell
-    docker-compose up --detach
-    ```
-  * Install Temporal CLI from Homebrew
-    ```shell
-    brew install temporal
-    ```
-  * Create new Namespace for our Labs
-    ```shell
-    temporal operator namespace create --namespace loan
-    ```
-  * Check Temporal CLI is running and Namespace present
-    ```shell
-    temporal operator namespace list
-    ```
-* Starting up your first Temporal Workflow 
-  * Start from Spring Initializr
-  * Add dependency for Temporal
-    ```kotlin
-    implementation("io.temporal:temporal-spring-boot-starter:$temporal")
-    ```
-  * Configure your Temporal library
-    ```kotlin
-    // Ensure Temporal can serialise/deserialise different kinds of payload
-    @Configuration
-    class TemporalConfig {
-    
-        companion object {
-            const val DEFAULT_TASK_QUEUE = "DefaultTaskQueue"
-            // Define more TaskQueue here if you need
-        }
-    
-        /**
-         * Creates a DataConverter bean for Temporal workflow data conversion.
-         * Supports multiple payload types including null, byte arrays, protobuf, and JSON.
-         *
-         * @param objectMapper Jackson ObjectMapper for JSON conversion
-         * @return Configured DataConverter instance
-         */
-        @Bean
-        fun dataConverter(objectMapper: ObjectMapper): DataConverter {
-            return DefaultDataConverter(
-                NullPayloadConverter(),
-                ByteArrayPayloadConverter(),
-                ProtobufJsonPayloadConverter(),
-                JacksonJsonPayloadConverter(objectMapper),
-            )
-        }
-    }
-    ```
-    ```kotlin
-    // Ensure our Worker is started when the application is started 
-    @Configuration
-    class TemporalInitialiser(private val factory: WorkerFactory) {
-    
-        private val logger = KotlinLogging.logger {}
-    
-        /**
-         * Event listener that starts the Temporal worker factory when the application is ready.
-         * This ensures that the worker factory is properly initialized after all Spring beans are created.
-         *
-         * @param event ApplicationReadyEvent triggered when the application is fully started
-         */
-        @Observed
-        @EventListener(ApplicationReadyEvent::class)
-        fun onApplicationReady(event: ApplicationReadyEvent) {
-            if (!factory.isStarted) factory.start()
-    
-            logger.info { ">> WorkerFactory :: Started!" }
-        }
-    }
-    ```
-  * Create your first Temporal Workflow
-    ```kotlin
-    @WorkflowInterface
-    interface MyFirstWorkflow {
-        
-        @WorkflowMethod
-        fun start(): String
-    }
-    
-    @WorkflowImpl(taskQueues = [TemporalConfig.DEFAULT_TASK_QUEUE])
-    class MyFirstWorkflowImpl : MyFirstWorkflow {
-    
-        override fun start(): String {
-            return "Hello World!"
-        }
-    }
-    ```
+## Labs
 
-### Lunch
+### Lab 1: Hello Workflow – Durable From Line One
+**Objectives**:
+* Understand how Temporal manages workflow state and execution.
+* Experience replay-based execution (no code rerun on restart).
+* Introduce workflow vs activity boundaries.
 
-### Session 2
+**Steps**:
+* Create a simple workflow with a `Workflow.sleep(10.seconds())`
+* Add a logging step before and after the sleep.
+* Run it, then stop the worker midway — restart and observe replay/resume.
+* Discussion point: What persisted? What was re-executed?
+
+**Concept Drops**:
+* What is a Workflow (deterministic and replayable)
+
+### Lab 2: Adding Activities – Side-Effects and Isolation
+**Objectives**:
+* Create real side-effecting activities.
+* Learn Temporal's boundary between logic (workflow) and I/O (activity).
+* Experience logs and outputs on the activity side.
+
+**Steps**:
+* Create an EmailActivity.sendConfirmation() method with a log.
+* Invoke it from workflow.
+* Throw an exception in the activity and see retry behavior.
+
+**Concept Drop**:
+* Activities are retried by Temporal, not you
+* Activities must be idempotent or handled defensively
+* Activity timeouts: start-to-close vs schedule-to-close
+
+### Lab 3: Resilience Through Retries & Timeouts
+**Objectives**:
+* Configure retry policies on activities.
+* See exponential backoff and max attempts in action.
+* Simulate transient failure (e.g., random failure in activity).
+
+**Steps**:
+* Add retry config to your activity with maxAttempts = 3.
+* Make your activity randomly fail (50% of the time).
+* Watch retries succeed or fail depending on randomness.
+* Add a short timeout and watch the impact.
+
+**Concept Drop**:
+* Retry policies are declarative
+* Difference between activity vs workflow timeouts
+
+### Lab 4: Durable Timers & Approval Waiting
+**Objectives**:
+* Use Workflow.sleep() to represent delay logic.
+* Simulate SLA timer / reminder flow.
+* Learn how timers survive restarts.
+
+**Steps**:
+* Add `Workflow.sleep(Duration.ofSeconds(60))` between two steps.
+* Kill the worker after sleep begins.
+* Restart and observe execution picks up from where it left off.
+
+**Concept Drop**:
+* Durable timers = no busy polling
+* Great for "wait for 3 days" scenarios
+* Sleep is persisted — not RAM-based
+
+### Lab 5: Signals & Queries (Optional / Advanced)
+**Objectives**:
+* Learn how external events modify workflow behavior.
+* Inject "approval" via a signal to skip sleep early.
+
+**Steps**:
+* Create a `receiveApproval()` signal method.
+* Update workflow to wait for either signal or sleep.
+* Trigger signal via CLI or test code and observe the fast path.
+
+**Concept Drop**:
+* Signals let you interact with workflows from outside
+* Temporal provides runtime API access (`WorkflowClient.signalWithStart`, etc.)
+* This sets up Stage 2 exploration of full signal/query communication models
+
+### Lab 6: Determinism – What Can Break It
+**Objectives**:
+* Understand replay problems
+* Learn how to safely use time and randomness
+
+**Steps**:
+* Add `UUID.randomUUID()` and watch the workflow fail on replay
+* Replace with Workflow.randomUUID() and see success
+* Same test with `System.currentTimeMillis()` vs `Workflow.currentTimeMillis()`
+
+**Concept Drop**:
+* Temporal replays workflow logic →  non-deterministic code breaks replay
+* Use Temporal-safe APIs
+* SideEffect / MutableSideEffect for some escape hatches
