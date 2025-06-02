@@ -24,15 +24,14 @@ Participants will get hands-on experience designing workflows and activities, ha
 2. JDK 21 or above, with Gradle 8.3 and above
 3. Docker and Docker Compose
 4. Homebrew
+  > **Note**: Find a good and simplistic use case for local temporal run
 
-> **Note**: Find a good and simplistic use case for local temporal run
-
-## Local Running Temporal
+### Local Running Temporal
 
 During this session participants will start by starting their own local Temporal setup.
 > **Read**: Technical materials [here](MATERIALS.md)
 
-## Labs
+## Day One
 
 ### Lab 1: Hello Workflow – Durable From Line One
 **Objectives**:
@@ -126,3 +125,81 @@ During this session participants will start by starting their own local Temporal
 * Temporal replays workflow logic →  non-deterministic code breaks replay
 * Use Temporal-safe APIs
 * SideEffect / MutableSideEffect for some escape hatches
+
+## Day Two
+
+### Lab 1: Child Workflows – Orchestrating at Scale
+**Objectives**:
+* Manage multiple child workflows
+* Understand error propagation
+
+**Steps**:
+* Parent workflow launches 3 child workflows.
+* Handle child completion and errors.
+* Observe tree view in Temporal UI.
+
+**Concept Drop**:
+* Parent-child relationship
+* Error propagation and observability
+
+## Lab 2: Idempotency & Rate Limiting
+**Objectives**:
+* Ensure idempotent activities
+* Implement custom rate limiting
+
+**Steps**:
+* Simulate duplicate activity invocations.
+* Use token bucket rate limiter in activities.
+
+**Concept Drop**:
+* Idempotency in retries
+* Temporal vs app-level rate limiting
+
+## Lab 2: Fan-Out / Fan-In – Parallel Activity Execution**
+
+**Objectives:**
+* Use Temporal’s `Async.function` to launch parallel activities
+* Fan-out multiple parallel activity tasks.
+* Fan-in: wait for all of them to complete before proceeding.
+
+**Steps:**
+* In workflow, use `Async.function` to fan-out multiple activities
+* Collect `futures` and use `.get()` to fan-in to wait for completion
+* Log the completion of all jobs.
+* Create an activity interface and implementation to process a single job (`processJob(jobId: String)`).
+* Run the workflow with a list of job IDs and observe the parallel execution in logs.
+
+**Concept Drop:**
+* **Fan-out**: spawning parallel activity tasks.
+* **Fan-in**: collecting results with `.get()` on futures.
+* Temporal’s **activity parallelism** is managed by workers – no thread starvation risk.
+* No need for external rate limiting or saga patterns in this scenario – perfect for batch jobs or bulk processing.
+
+
+## Lab 3: Saga Pattern & What to Avoid
+**Objectives**:
+* Implement saga-like patterns
+* Learn when to avoid them
+
+**Steps**:
+* Implement compensation workflows (basic saga).
+* Simulate partial failures.
+* Discuss better approaches (e.g., using Temporal’s durable activities/child workflows).
+
+**Concept Drop**:
+* Temporal discourages saga patterns for compensation
+* Prefer durable workflows for eventual consistency
+
+## Lab 4: Observability & Metrics
+**Objectives**:
+* Use built-in Temporal metrics
+* Add custom metrics
+
+**Steps**:
+* Enable metrics in Temporal server.
+* Add custom counters in activities.
+* Visualize with Prometheus/Grafana.
+
+**Concept Drop**:
+* Metrics for SLA tracking
+* Built-in vs custom metrics
