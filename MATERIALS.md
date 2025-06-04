@@ -25,44 +25,6 @@ Setup:
 implementation("io.temporal:temporal-spring-boot-starter:$temporal")
 ```
 
-* Configure our Temporal library
-```kotlin
-// Ensure Temporal can serialise/deserialise different kinds of payload
-@Configuration
-class TemporalConfig {
-
-    companion object {
-        const val DEFAULT_TASK_QUEUE = "DefaultTaskQueue"
-        // Define more TaskQueue here if you need
-    }
-
-    @Bean
-    fun dataConverter(objectMapper: ObjectMapper): DataConverter {
-        return DefaultDataConverter(
-            NullPayloadConverter(),
-            ByteArrayPayloadConverter(),
-            ProtobufJsonPayloadConverter(),
-            JacksonJsonPayloadConverter(objectMapper),
-        )
-    }
-}
-```
-```kotlin
-// Ensure our Worker is started when the application is started 
-@Configuration
-class TemporalInitialiser(private val factory: WorkerFactory) {
-
-    private val logger = KotlinLogging.logger {}
-
-    @Observed
-    @EventListener(ApplicationReadyEvent::class)
-    fun onApplicationReady(event: ApplicationReadyEvent) {
-        if (!factory.isStarted) factory.start()
-
-        logger.info { ">> WorkerFactory :: Started!" }
-    }
-}
-```
 
 * Create our first Temporal Workflow
 ```kotlin
