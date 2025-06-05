@@ -1,31 +1,3 @@
-
-Setup:
-### 1. Setting up Local environment
-* Run our [docker-compose.yaml](./docker-compose.yaml)
-  ```shell
-  docker-compose up --detach
-  ```
-* Install Temporal CLI from Homebrew
-  ```shell
-  brew install temporal
-  ```
-* Create new Namespace for our Labs
-  ```shell
-  temporal operator namespace create --namespace loan
-  ```
-* Check Temporal CLI is running and Namespace present
-  ```shell
-  temporal operator namespace list
-  ```
-
-### 2. Starting up our first Temporal Workflow
-* Start from Spring Initializr
-* Add dependency for Temporal
-```kotlin
-implementation("io.temporal:temporal-spring-boot-starter:$temporal")
-```
-
-
 * Create our first Temporal Workflow
 ```kotlin
 @WorkflowInterface
@@ -45,7 +17,7 @@ class MyFirstWorkflowImpl : MyFirstWorkflow {
 ```
 
 * Temporal Workflow lifecycle
-    * Starting our Workflow
+   * Starting our Workflow
 ```kotlin
 fun startGreeting(name: String) {
     val workflowId = "MyGreeting-$name"
@@ -63,7 +35,8 @@ fun startGreeting(name: String) {
     }
 }
 ```
-* Terminating our Workflow
+
+   * Terminating our Workflow
 ```kotlin
 fun terminate(workflowId: String) {
     try {
@@ -75,7 +48,8 @@ fun terminate(workflowId: String) {
     }
 }
 ```
-* Describing our Workflow
+
+   * Describing our Workflow
 ```kotlin
 fun describe(workflowId: String): String {
     return try {
@@ -102,7 +76,7 @@ fun describe(workflowId: String): String {
 }
 ```
 
-* Testing our Temporal Workflow
+   * Testing our Temporal Workflow
 ```kotlin
 class MyFirstWorkflowTest {
     
@@ -136,6 +110,7 @@ class MyFirstWorkflowTest {
     }
 }
 ```
+
 * Create our first Temporal Activity
 * Using Temporal Activity from our Temporal Workflow
 * Testing our Temporal Activity

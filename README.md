@@ -18,6 +18,7 @@ A Spring Boot application to demonstrate Temporal usage in application developme
 ### Testing
 - JUnit 5
 - Spring Boot Test
+- Temporal Test
 
 ## Functional Information
 
@@ -39,7 +40,9 @@ The Loan Processor is designed to provide a comprehensive solution for loan mana
 4. Late Payment Processing
 5. Restructuring
 
-## How to Run This Repository
+## [Academy Content](CONTENT.md) 
+
+## How to Run
 
 ### Prerequisites
 - JDK 21 or later

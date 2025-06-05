@@ -1,8 +1,8 @@
 # Temporal Orchestration
-**Date**: 16 July 2025
-**Duration**: 09:00 AM - 05:00 PM
-**Participants**: 70 engineers
-**Venue**: 
+* **Date**: 16 July 2025
+* **Duration**: 09:00 AM - 05:00 PM
+* **Participants**: 70 engineers
+* **Venue**: 
 
 ## Overview
 
@@ -12,25 +12,7 @@ This session introduces engineers to the core concepts of building reliable, lon
 
 Participants will get hands-on experience designing workflows and activities, handling timeouts and retries, and modeling real-world use cases where traditional polling or message queues fall short. We'll also cover Temporal's execution model, key architectural components, and how it ensures consistency across microservices — making it a powerful tool for coordinating complex operations in a scalable and observable way.
 
-## Pre-Training Setup Requirements
-
-### Infrastructure Setup
-
-1. Temporal Server Setup
-2. Database Setup
-
-### Local Setup
-
-1. IntelliJ
-2. JDK 21 or above, with Gradle 8.3 and above
-3. Docker and Docker Compose
-4. Homebrew
-  > **Note**: Find a good and simplistic use case for local temporal run
-
-### Local Running Temporal
-
-During this session participants will start by starting their own local Temporal setup.
-> **Read**: Technical materials [here](MATERIALS.md)
+## [Pre-Training Setup Requirements](SETUP.md)
 
 ## Day One
 
@@ -178,7 +160,7 @@ During this session participants will start by starting their own local Temporal
 * Create an activity interface and implementation to process a single job (`processJob(jobId: String)`).
 * Run the workflow with a list of job IDs and observe the parallel execution in logs.
 
-**Concept Drop:**
+**Concept Drop**:
 * **Fan-out**: spawning parallel activity tasks.
 * **Fan-in**: collecting results with `.get()` on futures.
 * Temporal's **activity parallelism** is managed by workers – no thread starvation risk.
