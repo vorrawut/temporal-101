@@ -24,7 +24,7 @@ A Spring Boot application to demonstrate Temporal usage in application developme
 
 The Loan Processor is designed to provide a comprehensive solution for loan management operations.
 
-### Planned Features
+### [Planned Features](USE_CASE.md)
 
 #### 1. Loan Disbursement
 1. Loan Application
@@ -40,7 +40,7 @@ The Loan Processor is designed to provide a comprehensive solution for loan mana
 4. Late Payment Processing
 5. Restructuring
 
-## [Academy Content](CONTENT.md) 
+## [Academy Content](CONTENT.md)
 
 ## How to Run
 
