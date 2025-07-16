@@ -1,8 +1,11 @@
 package dk.academy.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import dk.academy.temporal.workflow.MyFirstWorkflow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.observation.annotation.Observed
+import io.temporal.client.WorkflowClient
+import io.temporal.client.newWorkflowStub
 import io.temporal.common.converter.*
 import io.temporal.worker.WorkerFactory
 import org.springframework.boot.context.event.ApplicationReadyEvent
@@ -46,6 +49,7 @@ class TemporalConfig {
 @Configuration
 class TemporalInitialiser(
     private val factory: WorkerFactory,
+    private val workflowClient: WorkflowClient,
 ) {
 
     private val logger = KotlinLogging.logger {}
@@ -60,7 +64,26 @@ class TemporalInitialiser(
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady(event: ApplicationReadyEvent) {
         if (!factory.isStarted) factory.start()
+        startGreeting("abc")
 
         logger.info { ">> WorkerFactory :: Started!" }
     }
+
+    fun startGreeting(name: String) {
+        val workflowId = "MyGreeting-$name"
+        try {
+            val workflow = workflowClient
+                .newWorkflowStub<MyFirstWorkflow> {
+                    setWorkflowId(workflowId)
+                    setTaskQueue(TemporalConfig.DEFAULT_TASK_QUEUE)
+                }
+
+            WorkflowClient.start { workflow.start(name) }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to start MyFirstWorkflow for Request(name=$name)" }
+            throw e
+        }
+    }
+
+
 }
